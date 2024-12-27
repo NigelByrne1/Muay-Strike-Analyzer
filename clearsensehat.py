@@ -1,4 +1,7 @@
 from sense_hat import SenseHat
 
+#tool to clear sense hat leds
+
 sense = SenseHat()
-sense.clear()
+def clear_sense_hat():
+    sense.clear()
