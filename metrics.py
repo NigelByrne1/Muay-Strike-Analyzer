@@ -1,7 +1,11 @@
+from blynk_updater import update_blynk
+
 # Metrics state variables
 total_power = 0.0
 kick_count = 0
 kick_intensities = []  # use an array to store kick intensities 
+average_power = 0
+
 
 def calculate_acceleration_sum(motion_data):
     #use motion date from 3 axis xyz to make a acceraltion sum
@@ -16,6 +20,24 @@ def update_metrics(intensity):
     kick_count += 1 
     total_power += intensity #adds the intensity to the total power measurement
     kick_intensities.append(intensity) # adds the intensity to the kick intensities array
+    update_blynk_metrics(kick_count, intensity)
+    
+    
+def update_blynk_metrics(kick_count, intensity):
+    kick_count_blynk = get_kick_count(kick_count)
+    average_power = get_average_power()
+    kick_intensity_blynk = get_kick_intensity(intensity)
+    update_blynk(kick_count_blynk, average_power, kick_intensity_blynk)
+
+def get_kick_count(kick_count):
+    return kick_count
+    
+def get_kick_intensity(kick_intensity):
+    if kick_intensity > 1:
+        kick_intensity 
+    elif kick_intensity == 0: 
+        return 0
+
 
 def get_average_power():
     # takes total power and devides by number of kicks to determine average power
@@ -27,5 +49,8 @@ def get_average_power():
 def print_metrics():
     # prints a summary of the round
     print(f"Total Kicks: {kick_count}")
+    
     print(f"Average Power: {get_average_power():.2f}")
+    
     print(f"Kick Intensities: {kick_intensities}")
+    

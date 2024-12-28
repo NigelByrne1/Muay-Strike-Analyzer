@@ -1,10 +1,12 @@
 from metrics import update_metrics, print_metrics, calculate_acceleration_sum
-from config import ROUND_DURATION, KICK_THRESHOLD_LOW
+from config import ROUND_DURATION, KICK_THRESHOLD_LOW, BLYNK_AUTH
 from clearsensehat import clear_sense_hat
-import time
 from sense_hat import SenseHat
+import BlynkLib
+import time
 
 sense = SenseHat()
+blynk = BlynkLib.Blynk(BLYNK_AUTH)
 
 def get_motion_data():
     # collect the raw date using the sense hat
@@ -29,20 +31,23 @@ def start_led_timer(remaining_time):
     else:
             sense.show_letter(str(remaining_time), text_colour=[255, 255, 0])
 
+
 def main():
     print("Starting round...")
     clear_sense_hat()
+    
 
     remaining_time = ROUND_DURATION
 
     # Show countdown on Sense HAT LEDs and colsole
     while remaining_time>0:
+        blynk.run()
 
         start_led_timer(remaining_time)
         start_console_timer(remaining_time)
 
         i=0
-        # Detect kicks and update metrics
+        # Detect kicks and update metrics.  while i with time.sleep built in to make sure it can detect upto 5 kicks a second
         while i<5:
             motion_data = get_motion_data()
             kick_intensity = detect_kick(motion_data)
@@ -53,6 +58,8 @@ def main():
         
         remaining_time -= 1
     clear_sense_hat()
+    
+    
     # Display final summary after the round
     print_metrics()
     print("Round complete!")
