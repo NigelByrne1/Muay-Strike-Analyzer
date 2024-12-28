@@ -2,6 +2,7 @@ from metrics import update_metrics, print_metrics, calculate_acceleration_sum
 from config import ROUND_DURATION, KICK_THRESHOLD_LOW, BLYNK_AUTH
 from clearsensehat import clear_sense_hat
 from sense_hat import SenseHat
+from blynk_updater import update_blynk
 import BlynkLib
 import time
 
@@ -35,7 +36,7 @@ def start_led_timer(remaining_time):
 def main():
     print("Starting round...")
     clear_sense_hat()
-    
+    update_blynk(0 , 0 , 0) #initialise blynk values
 
     remaining_time = ROUND_DURATION
 
@@ -46,8 +47,9 @@ def main():
         start_led_timer(remaining_time)
         start_console_timer(remaining_time)
 
-        i=0
+        
         # Detect kicks and update metrics.  while i with time.sleep built in to make sure it can detect upto 5 kicks a second
+        i=0
         while i<5:
             motion_data = get_motion_data()
             kick_intensity = detect_kick(motion_data)
