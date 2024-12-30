@@ -9,7 +9,7 @@ import time
 sense = SenseHat()
 blynk = BlynkLib.Blynk(BLYNK_AUTH)
 start_round_flag = False
-kick_threshold = 1.5  # default value
+kick_threshold = 2  # default value
 round_duration = 10 #default value
 
 @blynk.on("V3")  # Virtual pin for the start button
