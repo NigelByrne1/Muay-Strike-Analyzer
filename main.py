@@ -1,5 +1,5 @@
 from metrics import update_metrics, print_metrics, calculate_acceleration_sum
-from config import KICK_THRESHOLD_LOW, BLYNK_AUTH
+from config import BLYNK_AUTH
 from clearsensehat import clear_sense_hat
 from sense_hat import SenseHat
 from blynk_updater import update_blynk, update_blynk_remaining_time
@@ -9,6 +9,8 @@ import time
 sense = SenseHat()
 blynk = BlynkLib.Blynk(BLYNK_AUTH)
 start_round_flag = False
+kick_threshold = 1.5  # default value
+round_duration = 10 #default value
 
 @blynk.on("V3")  # Virtual pin for the start button
 def handle_start_button(value):
@@ -22,6 +24,12 @@ def handle_duration_input(value):
     global round_duration
     round_duration = int(value[0])  # Directly assign the value since Blynk has default/min/max values
     print(f"Updated round duration to {round_duration} seconds")
+
+@blynk.on("V6")  # Virtual pin for kick threshold slider
+def handle_duration_input(value):
+    global kick_threshold
+    kick_threshold = float(value[0])  # Directly assign the value since Blynk has default/min/max values
+    print(f"Updated kick threshold to {kick_threshold} ")
 
 def wait_for_start():
     global start_round_flag
@@ -37,7 +45,7 @@ def get_motion_data():
 def detect_kick(motion_data):
     # detect a kick then return the acceleration to 3 decimal places
     acceleration = calculate_acceleration_sum(motion_data)
-    if acceleration >= KICK_THRESHOLD_LOW:
+    if acceleration >= kick_threshold:
        rounded_acceleration = round(acceleration, 3)  # Return raw acceleration to 3 decimal places for further scaling
        return rounded_acceleration
     return None
@@ -52,7 +60,6 @@ def start_led_timer(remaining_time):
             sense.show_message(str(remaining_time), text_colour=[255, 255, 0], scroll_speed=0.05)
     else:
             sense.show_letter(str(remaining_time), text_colour=[255, 255, 0])
-
 
 def main():
     print("Starting the App")
