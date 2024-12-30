@@ -2,12 +2,27 @@ from metrics import update_metrics, print_metrics, calculate_acceleration_sum
 from config import ROUND_DURATION, KICK_THRESHOLD_LOW, BLYNK_AUTH
 from clearsensehat import clear_sense_hat
 from sense_hat import SenseHat
-from blynk_updater import update_blynk
+from blynk_updater import update_blynk, update_blynk_remaining_time
 import BlynkLib
 import time
 
 sense = SenseHat()
 blynk = BlynkLib.Blynk(BLYNK_AUTH)
+start_round_flag = False
+
+@blynk.on("V3")  # Virtual pin for the start button
+def handle_start_button(value):
+    global start_round_flag
+    if value[0] == "1":  # Button pressed
+        start_round_flag = True
+        print("Start button pressed!")
+
+def wait_for_start():
+    global start_round_flag
+    print("Waiting for start button press...")
+    while start_round_flag == False:
+        blynk.run()
+        time.sleep(0.1)
 
 def get_motion_data():
     # collect the raw date using the sense hat
@@ -34,37 +49,42 @@ def start_led_timer(remaining_time):
 
 
 def main():
-    print("Starting round...")
+    print("Starting the App")
     clear_sense_hat()
     update_blynk(0 , 0 , 0) #initialise blynk values
+    global start_round_flag
+    while True:
+        wait_for_start() #wait for button to be true
+        print("Starting round...")
+        start_round_flag = False # reset the start round flag
+        remaining_time = ROUND_DURATION
 
-    remaining_time = ROUND_DURATION
+        # Show countdown on Sense HAT LEDs and colsole
+        while remaining_time>0:
+            blynk.run()
+            start_led_timer(remaining_time)
+            start_console_timer(remaining_time)
+            update_blynk_remaining_time(remaining_time)
+            
+            # Detect kicks and update metrics.  while i with time.sleep built in to make sure it can detect upto 5 kicks a second
+            i=0
+            while i<5:
+                motion_data = get_motion_data()
+                kick_intensity = detect_kick(motion_data)
+                if kick_intensity:
+                    update_metrics(kick_intensity)  # Store raw intensity for analysis
+                time.sleep(0.2)
+                i+=1
+            
+            remaining_time -= 1
+            
 
-    # Show countdown on Sense HAT LEDs and colsole
-    while remaining_time>0:
-        blynk.run()
-
-        start_led_timer(remaining_time)
-        start_console_timer(remaining_time)
-
-        
-        # Detect kicks and update metrics.  while i with time.sleep built in to make sure it can detect upto 5 kicks a second
-        i=0
-        while i<5:
-            motion_data = get_motion_data()
-            kick_intensity = detect_kick(motion_data)
-            if kick_intensity:
-                update_metrics(kick_intensity)  # Store raw intensity for analysis
-            time.sleep(0.2)
-            i+=1
-        
-        remaining_time -= 1
-    clear_sense_hat()
+        clear_sense_hat()
     
     
-    # Display final summary after the round
-    print_metrics()
-    print("Round complete!")
+        # Display final summary after the round
+        print_metrics()
+        print("Round complete!")
 
 
 if __name__ == "__main__":

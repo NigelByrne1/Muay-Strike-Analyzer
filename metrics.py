@@ -29,6 +29,9 @@ def update_blynk_metrics(kick_count, intensity):
 def get_kick_count(kick_count):
     return kick_count
     
+def get_remaining_time(remaining_time):
+    return remaining_time
+
 def get_kick_intensity(kick_intensity):
     if kick_intensity > 1:
         kick_intensity 

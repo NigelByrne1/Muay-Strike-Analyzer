@@ -1,5 +1,5 @@
 # Round settings
-ROUND_DURATION = 10  # Duration of workout round in seconds
+ROUND_DURATION = 15  # Duration of workout round in seconds
 
 # Kick thresholds
 KICK_THRESHOLD_LOW = 2  # Minimum threshold for detecting a kick (2 seems to work well for heavy bag)
