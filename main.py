@@ -1,5 +1,5 @@
 from metrics import update_metrics, print_metrics, calculate_acceleration_sum
-from config import ROUND_DURATION, KICK_THRESHOLD_LOW, BLYNK_AUTH
+from config import KICK_THRESHOLD_LOW, BLYNK_AUTH
 from clearsensehat import clear_sense_hat
 from sense_hat import SenseHat
 from blynk_updater import update_blynk, update_blynk_remaining_time
@@ -16,6 +16,12 @@ def handle_start_button(value):
     if value[0] == "1":  # Button pressed
         start_round_flag = True
         print("Start button pressed!")
+
+@blynk.on("V4")  # Virtual pin for round duration slider
+def handle_duration_input(value):
+    global round_duration
+    round_duration = int(value[0])  # Directly assign the value since Blynk has default/min/max values
+    print(f"Updated round duration to {round_duration} seconds")
 
 def wait_for_start():
     global start_round_flag
@@ -57,7 +63,7 @@ def main():
         wait_for_start() #wait for button to be true
         print("Starting round...")
         start_round_flag = False # reset the start round flag
-        remaining_time = ROUND_DURATION
+        remaining_time = round_duration
 
         # Show countdown on Sense HAT LEDs and colsole
         while remaining_time>0:
