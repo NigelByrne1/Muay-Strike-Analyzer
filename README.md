@@ -76,3 +76,8 @@ The device is attached securely to a punching bag and starts tracking as soon as
 ![Muay Strike Analyzer Graphic](https://i.ibb.co/MGDQXhS/3.png "Muay Strike Analyzer Graphic")
 
 ![Muay Strike Analyzer Graphic](https://i.ibb.co/tcwd9pY/4.png "Muay Strike Analyzer Graphic")
+
+## Video of Device in Action
+
+[![YouTube Video](https://img.youtube.com/vi/k_CgQP0xwYE/0.jpg)](https://youtu.be/k_CgQP0xwYE)
+
